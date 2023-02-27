@@ -3,7 +3,7 @@ import axios from 'axios'
 // import exportFile from '@/const/export-file'
 import { setCookie, getCookie, clearCookie } from '../pages/util/cookie'
 
-export const baseURL = '/wecmdb/api/v1'
+export const baseURL = '/nsos/api/v1'
 export const req = axios.create({
   withCredentials: false,
   baseURL,

@@ -183,7 +183,7 @@ export default {
         graphSetting,
         graphData,
         ci => {
-          return '/wecmdb/fonts/' + this.ciTypeMapping[ci].imageFile
+          return '/nsos/fonts/' + this.ciTypeMapping[ci].imageFile
         },
         [graphIndex]
       )[0]

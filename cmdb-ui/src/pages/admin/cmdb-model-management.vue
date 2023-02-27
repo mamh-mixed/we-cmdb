@@ -805,7 +805,7 @@
               <FormItem :label="$t('icon')">
                 <img
                   v-if="editGroupAttr.imageFile"
-                  :src="`/wecmdb/fonts/${editGroupAttr.imageFile}`"
+                  :src="`/nsos/fonts/${editGroupAttr.imageFile}`"
                   height="58"
                   width="58"
                 />
@@ -2040,7 +2040,7 @@ export default {
                 '";class="ci";' +
                 'fontcolor="' +
                 statusColors.get(ciType.status) +
-                '";image="/wecmdb/fonts/' +
+                '";image="/nsos/fonts/' +
                 ciType.imageFile +
                 '";labelloc="b"]\n'
               ciTypeSet.add(ciType.ciTypeId)
