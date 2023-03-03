@@ -109,5 +109,10 @@ export const INPUT_TYPE_CONFIG = [
     code: 'richText',
     value: 'text',
     length: 0
+  },
+  {
+    code: 'cos',
+    value: 'text',
+    length: 0
   }
 ]
