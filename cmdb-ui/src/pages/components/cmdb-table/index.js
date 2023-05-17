@@ -813,6 +813,26 @@ export default {
           this.tableDetailInfo.isShow = true
         }
       }
+
+      const getDiffVariable = async (row, key) => {
+        this.tableDetailInfo.isShow = false
+        const rowData = this.tableData.find(item => row.guid === item.guid)
+        const vari = rowData[key].replaceAll('\u0001', '').split('=')
+        const keys = vari[0].split(',')
+        const values = vari[1].split(',')
+        let res = []
+        for (let i = 0; i < keys.length; i++) {
+          res.push({
+            key: keys[i],
+            value: values[i]
+          })
+        }
+        this.tableDetailInfo.title = this.$t('variable_format')
+        this.tableDetailInfo.type = 'diffVariable'
+        this.tableDetailInfo.info = res
+        this.tableDetailInfo.isShow = true
+      }
+
       const generalParams = {
         ...col,
         tooltip: true,
@@ -891,6 +911,23 @@ export default {
                 onClick={() => getPassword(params.row, col.key)}
               />
               {params.row.weTableForm[col.key]}
+            </span>
+          )
+        }
+        return generalParams
+      }
+      // if (col.ciTypeAttrId === 'app_instance__variable_values') {
+      if (col.inputType === 'diffVariable') {
+        generalParams.render = (h, params) => {
+          return (
+            <span>
+              <Icon
+                size="16"
+                type="ios-apps-outline"
+                color="#2d8cf0"
+                onClick={() => getDiffVariable(params.row, col.key)}
+              />
+              {params.row.weTableForm[col.key].slice(0, 18) + '...'}
             </span>
           )
         }
@@ -1025,9 +1062,6 @@ export default {
     const closeModal = () => {
       this.tableDetailInfo.isShow = false
     }
-    const showColsSelect = () => {
-      this.colSelectVisible = !this.colSelectVisible
-    }
     let selectAttrs = []
     this.tableColumns.forEach(t => {
       if (t.ciTypeAttrId) {
@@ -1037,51 +1071,10 @@ export default {
         selectAttrs.push(t.ciTypeAttrId)
       }
     })
-    const changeColDisplay = ciTypeAttrId => {
-      let attr = this.tableColumns.find(t => t.ciTypeAttrId === ciTypeAttrId)
-      attr.displayByDefault = attr.displayByDefault === 'yes' ? 'no' : 'yes'
-      if (selectAttrs.includes(ciTypeAttrId)) {
-        const index = selectAttrs.findIndex(s => s === ciTypeAttrId)
-        selectAttrs = selectAttrs.splice(index, 1)
-      } else {
-        selectAttrs.push(ciTypeAttrId)
-      }
-    }
     return (
       <div>
         {!filtersHidden && <div>{this.getFormFilters()}</div>}
         <Row style="margin-bottom:10px">{this.getTableOuterActions()}</Row>
-        {this.isShowFilter && (
-          <div style="position: relative;top: -40px;right: 30px;float: right;">
-            <Poptip value={this.colSelectVisible} placement="bottom">
-              <Button type="primary" on-click={showColsSelect} shape="circle" icon="ios-funnel-outline"></Button>
-              <div slot="content">
-                {this.tableColumns.map(t => {
-                  const ciTypeAttrId = t.ciTypeAttrId
-                  if (selectAttrs.includes(ciTypeAttrId)) {
-                    return (
-                      <div
-                        onClick={() => changeColDisplay(ciTypeAttrId)}
-                        style="cursor:pointer;height: 22px;line-height: 22px;margin: 2px 4px 2px 0;padding: 0 2px;border: 1px solid #2d8cf0;color:#2d8cf0;font-size: 12px;vertical-align: middle;opacity: 1;overflow: hidden;border-radius: 3px;"
-                      >
-                        {t.displayName}
-                      </div>
-                    )
-                  } else {
-                    return (
-                      <div
-                        onClick={() => changeColDisplay(ciTypeAttrId)}
-                        style="cursor:pointer;height: 22px;line-height: 22px;margin: 2px 4px 2px 0;padding: 0 2px;border: 1px solid #e8eaec;font-size: 12px;vertical-align: middle;opacity: 1;overflow: hidden;border-radius: 3px;"
-                      >
-                        {t.displayName}
-                      </div>
-                    )
-                  }
-                })}
-              </div>
-            </Poptip>
-          </div>
-        )}
         <Table
           loading={tableLoading}
           ref="table"
@@ -1130,7 +1123,7 @@ export default {
             </div>
           )}
         </div>
-        <Modal value={this.tableDetailInfo.isShow} footer-hide={true} title={this.tableDetailInfo.title}>
+        <Modal value={this.tableDetailInfo.isShow} footer-hide={true} title={this.tableDetailInfo.title} width={700}>
           {this.tableDetailInfo.type === 'string' && (
             <div style="text-align: justify;word-break: break-word;">{this.tableDetailInfo.info}</div>
           )}
@@ -1156,6 +1149,22 @@ export default {
                   )
                 })}
               </Collapse>
+            </div>
+          )}
+          {this.tableDetailInfo.type === 'diffVariable' && (
+            <div style="text-align: justify;word-break: break-word;overflow-y:auto;max-height:500px">
+              <Form label-width={200}>
+                {this.tableDetailInfo.info.map(val => {
+                  return (
+                    <FormItem label={val.key}>
+                      <div slot="label">
+                        <span style={val.value === '' ? 'color:red' : ''}>{val.key}</span>
+                      </div>
+                      <span style="width: 480px;">:&nbsp;&nbsp;{val.value}</span>
+                    </FormItem>
+                  )
+                })}
+              </Form>
             </div>
           )}
           <div style="margin-top:20px;height: 30px">
