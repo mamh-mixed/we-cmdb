@@ -35,6 +35,7 @@ func CiTypesQuery(c *gin.Context) {
 	}
 	param.GroupBy = c.Query("group-by")
 	param.WithAttributes = c.Query("with-attributes")
+	param.Language = c.GetString(models.ContextLanguage)
 	err := db.CiTypesQuery(&param)
 	if err != nil {
 		middleware.ReturnServerHandleError(c, err)

@@ -600,6 +600,22 @@ func updateActionFunc(param *models.ActionFuncParam) (result []*execAction, err 
 		//	param.UpdateColumn = append(param.UpdateColumn, ciAttr.Name)
 		//}
 	}
+	var inputDataUselessKeys []string
+	for k, _ := range param.InputData {
+		matchAttrFlag := false
+		for _, ciAttr := range param.Attributes {
+			if ciAttr.Name == k {
+				matchAttrFlag = true
+				break
+			}
+		}
+		if !matchAttrFlag {
+			inputDataUselessKeys = append(inputDataUselessKeys, k)
+		}
+	}
+	for _, v := range inputDataUselessKeys {
+		delete(param.InputData, v)
+	}
 	for _, multiRefColumn := range multiRefColumnList {
 		delete(param.InputData, multiRefColumn)
 	}

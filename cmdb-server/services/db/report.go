@@ -161,22 +161,37 @@ func GetChildReportObject(root *models.ReportObjectNode, rootGuidList []string, 
 		}
 	}
 	extendFilterSql := ""
+	var extendFilterArgs []interface{}
 	queryTableName := root.CiType
 	isEditable := checkReportObjectEditable(viewId, root.Id)
 	if confirmTime != "" {
 		queryTableName = HistoryTablePrefix + root.CiType
 		if isEditable {
-			extendFilterSql = fmt.Sprintf(" AND confirm_time='%s' AND history_state_confirmed=1", confirmTime)
+			extendFilterSql = " AND confirm_time=? AND history_state_confirmed=1"
+			extendFilterArgs = append(extendFilterArgs, confirmTime)
 		} else {
 			filterCols += ",id"
-			extendFilterSql = fmt.Sprintf(" AND ((confirm_time<='%s' AND history_state_confirmed=1) OR (update_time<='%s' AND confirm_time IS NULL))", confirmTime, confirmTime)
+			extendFilterSql = " AND ((confirm_time<=? AND history_state_confirmed=1) OR (update_time<=? AND confirm_time IS NULL))"
+			extendFilterArgs = append(extendFilterArgs, confirmTime, confirmTime)
 		}
 	}
-	sqlCmd := "SELECT " + filterCols + " FROM `" + queryTableName + "` WHERE `" + tmpFilter + "` in ('" + strings.Join(rootGuidList, "','") + "')" + extendFilterSql + " order by key_name"
-	ciTypeTableData, err := x.QueryString(sqlCmd)
-	if err != nil {
-		log.Error(nil, log.LOGGER_APP, "Query report object citype table error", zap.String("ciTypeTable", root.CiType), zap.Error(err))
-		return
+	var ciTypeTableData []map[string]string
+	if len(rootGuidList) > 0 {
+		placeholders := make([]string, len(rootGuidList))
+		inArgs := make([]interface{}, len(rootGuidList))
+		for i, v := range rootGuidList {
+			placeholders[i] = "?"
+			inArgs[i] = v
+		}
+		sqlCmd := "SELECT " + filterCols + " FROM `" + queryTableName + "` WHERE `" + tmpFilter + "` IN (" + strings.Join(placeholders, ",") + ")" + extendFilterSql + " ORDER BY key_name"
+		queryArgs := make([]interface{}, 0, len(inArgs)+len(extendFilterArgs))
+		queryArgs = append(queryArgs, inArgs...)
+		queryArgs = append(queryArgs, extendFilterArgs...)
+		ciTypeTableData, err = x.QueryString(append([]interface{}{sqlCmd}, queryArgs...)...)
+		if err != nil {
+			log.Error(nil, log.LOGGER_APP, "Query report object citype table error", zap.String("ciTypeTable", root.CiType), zap.Error(err))
+			return
+		}
 	}
 	if !isEditable {
 		ciTypeTableData = distinctViewCiData(ciTypeTableData)
@@ -1367,14 +1382,30 @@ func isReportObjEditable(reportObjId string) bool {
 }
 
 func GetPermissiveReportId(permissions []string, roles []string, hasReportIds []string) (reportIds []string, err error) {
-	permissionStr := strings.Join(permissions, "','")
-	roleStr := strings.Join(roles, "','")
-	sqlCmd := "SELECT DISTINCT report FROM sys_role_report WHERE role IN ('" + roleStr + "')" + " AND permission IN ('" + permissionStr + "')"
-	if len(hasReportIds) > 0 {
-		reportIdStr := strings.Join(hasReportIds, "','")
-		sqlCmd += " AND view IN ('" + reportIdStr + "')"
+	if len(permissions) == 0 || len(roles) == 0 {
+		return
 	}
-	rowData, tmpErr := x.QueryString(sqlCmd)
+	permPlaceholders := make([]string, len(permissions))
+	roleplaceholders := make([]string, len(roles))
+	sqlArgs := make([]interface{}, 0, len(roles)+len(permissions))
+	for i, v := range roles {
+		roleplaceholders[i] = "?"
+		sqlArgs = append(sqlArgs, v)
+	}
+	for i, v := range permissions {
+		permPlaceholders[i] = "?"
+		sqlArgs = append(sqlArgs, v)
+	}
+	sqlCmd := "SELECT DISTINCT report FROM sys_role_report WHERE role IN (" + strings.Join(roleplaceholders, ",") + ") AND permission IN (" + strings.Join(permPlaceholders, ",") + ")"
+	if len(hasReportIds) > 0 {
+		idPlaceholders := make([]string, len(hasReportIds))
+		for i, v := range hasReportIds {
+			idPlaceholders[i] = "?"
+			sqlArgs = append(sqlArgs, v)
+		}
+		sqlCmd += " AND view IN (" + strings.Join(idPlaceholders, ",") + ")"
+	}
+	rowData, tmpErr := x.QueryString(append([]interface{}{sqlCmd}, sqlArgs...)...)
 	if tmpErr != nil {
 		err = fmt.Errorf("Query permissive report ids in role report error:%s", tmpErr.Error())
 		log.Error(nil, log.LOGGER_APP, "Query permissive report ids in role report error", zap.Error(err))

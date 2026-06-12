@@ -45,6 +45,10 @@ const (
 
 	TmpSyncDir   = "/tmp/sync/"
 	SyncNexusDir = "/"
+
+	ContextLanguage = "language"
+	LanguageEn      = "en"
+	LanguageZh      = "zh"
 )
 
 var (

@@ -36,6 +36,7 @@ type CiTypeQuery struct {
 	AttrTypeStatus []string `json:"attr-type-status"`
 	GroupData      []*CiTypeQueryGroupObj
 	CiTypeListData []*CiTypeQueryCiObj
+	Language       string `json:"-"`
 }
 
 type CiTypeQueryGroupObj struct {

@@ -471,7 +471,7 @@ func fetchExtRefAttrData(refAttrs []*models.CiDataQueryRefAttrObj) (err error) {
 		}
 		tmpQueryRows, tmpQueryErr := GetExtendModelData(entitySplit[0], entitySplit[1], "", models.CoreToken.GetCoreToken())
 		if tmpQueryErr != nil {
-			err = fmt.Errorf("get ext model data fail,%s ", tmpQueryErr.Error())
+			log.Warn(nil, log.LOGGER_APP, "get ext model data fail", zap.Error(tmpQueryErr))
 			break
 		}
 		refRowDatas := []*models.CiDataRefDataObj{}
