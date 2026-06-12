@@ -126,7 +126,9 @@ func GetExtendModelData(packageName, entity, id, userToken string) (result []map
 	}
 	responseBytes, respErr := doRequestPlatform(fmt.Sprintf("/%s/entities/%s/query", packageName, entity), http.MethodPost, userToken, &param)
 	if respErr != nil {
-		err = respErr
+		log.Warn(nil, log.LOGGER_APP, "GetExtendModelData fail", zap.Error(respErr))
+		result = []map[string]interface{}{}
+		// err = respErr
 		return
 	}
 	var response models.EntityResponse
@@ -162,7 +164,7 @@ func doRequestPlatform(url, method, token string, postData interface{}) (respons
 	req.Header.Set("Content-Type", "application/json")
 	requestId := "req_" + guid.CreateGuid()
 	req.Header.Set("RequestId", requestId)
-	log.Debug(nil, log.LOGGER_APP, "doRequest to Platform start --->", zap.String("requestId", requestId), zap.String("url", url), zap.String("method", method))
+	log.Debug(nil, log.LOGGER_APP, "doRequest to Platform start --->", zap.String("requestId", requestId), zap.String("url", url), zap.String("method", method), zap.String("token", token))
 	resp, respErr := http.DefaultClient.Do(req)
 	if respErr != nil {
 		err = fmt.Errorf("Start do request to platform fail:%s ", respErr.Error())

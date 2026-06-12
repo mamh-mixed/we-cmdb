@@ -2,11 +2,12 @@ package report
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/WeBankPartners/we-cmdb/cmdb-server/api/middleware"
 	"github.com/WeBankPartners/we-cmdb/cmdb-server/models"
 	"github.com/WeBankPartners/we-cmdb/cmdb-server/services/db"
 	"github.com/gin-gonic/gin"
-	"strings"
 )
 
 func QueryReport(c *gin.Context) {
@@ -41,6 +42,11 @@ func QueryReport(c *gin.Context) {
 	} else {
 		if len(rowData) == 0 {
 			rowData = []*models.SysReportTable{}
+		}
+		if c.GetString(models.ContextLanguage) == models.LanguageEn {
+			for _, v := range rowData {
+				v.Name = v.Id
+			}
 		}
 		middleware.ReturnData(c, rowData)
 	}

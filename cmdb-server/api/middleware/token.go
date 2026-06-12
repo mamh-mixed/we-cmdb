@@ -93,6 +93,13 @@ func AuthToken() gin.HandlerFunc {
 }
 
 func authRequest(c *gin.Context) error {
+	if strings.Contains(c.GetHeader("Accept-Language"), "zh-") {
+		c.Set(models.ContextLanguage, models.LanguageZh)
+	} else if strings.Contains(c.GetHeader("Accept-Language"), "en-") {
+		c.Set(models.ContextLanguage, models.LanguageEn)
+	} else {
+		c.Set(models.ContextLanguage, "")
+	}
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
 		return fmt.Errorf("Can not find Request Header Authorization ")

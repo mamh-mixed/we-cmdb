@@ -21,6 +21,9 @@ var (
 	specialSeparateChar  = "," + models.SEPERATOR
 	specialAndChar       = "&" + models.SEPERATOR
 	specialNullChar      = "NULL" + models.SEPERATOR
+	charFuncUpper        = "upperCase"
+	charFuncLower        = "lowerCase"
+	charFuncLowerDash        = "lowerDash"
 )
 
 func buildAutofillValue(columnMap map[string]string, rule, attrInputType string) (newValueList []string, err error) {
@@ -62,6 +65,7 @@ func buildAutofillValue(columnMap map[string]string, rule, attrInputType string)
 	var ruleObjValueList [][]string
 	var autofillSubIndex, ruleSubIndex []int
 	isSpecialStruct := false
+	charFunc := ""
 	for i, ruleObj := range ruleList {
 		// json结构表达式
 		if ruleObj.Type == "rule" {
@@ -94,6 +98,27 @@ func buildAutofillValue(columnMap map[string]string, rule, attrInputType string)
 				tmpValueList = newTmpValueList
 			}
 			ruleSubIndex = append(ruleSubIndex, i)
+			if charFunc != "" {
+				newTmpValueList := []string{}
+				if charFunc == charFuncUpper {
+					for _, tmpValue := range tmpValueList {
+						newTmpValueList = append(newTmpValueList, strings.ToUpper(tmpValue))
+					}
+					tmpValueList = newTmpValueList
+				} else if charFunc == charFuncLower {
+					for _, tmpValue := range tmpValueList {
+						newTmpValueList = append(newTmpValueList, strings.ToLower(tmpValue))
+					}
+					tmpValueList = newTmpValueList
+				} else if charFunc == charFuncLowerDash {
+					for _, tmpValue := range tmpValueList {
+						newTmpValueList = append(newTmpValueList, strings.ReplaceAll(strings.ToLower(tmpValue), "_", "-"))
+					}
+					tmpValueList = newTmpValueList
+				}
+				
+				charFunc = ""
+			}
 			ruleObjValueList = append(ruleObjValueList, tmpValueList)
 			log.Debug(nil, log.LOGGER_APP, "make resultValueList 3", zap.Strings("list", tmpValueList), zap.String("ruleObjValueList", fmt.Sprintf("%s", ruleObjValueList)), zap.String("ruleSubIndex", fmt.Sprintf("%v", ruleSubIndex)))
 		} else if ruleObj.Type == "delimiter" {
@@ -108,6 +133,8 @@ func buildAutofillValue(columnMap map[string]string, rule, attrInputType string)
 			}
 			ruleObjValueList = append(ruleObjValueList, []string{ruleObj.Value})
 			isSpecialStruct = true
+		} else if ruleObj.Type == "charFunc" {
+			charFunc = ruleObj.Value
 		}
 	}
 	if err != nil || len(ruleObjValueList) == 0 {

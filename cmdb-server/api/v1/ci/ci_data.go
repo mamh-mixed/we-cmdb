@@ -12,9 +12,11 @@ import (
 
 	"github.com/WeBankPartners/go-common-lib/cipher"
 	"github.com/WeBankPartners/we-cmdb/cmdb-server/api/middleware"
+	"github.com/WeBankPartners/we-cmdb/cmdb-server/common/log"
 	"github.com/WeBankPartners/we-cmdb/cmdb-server/models"
 	"github.com/WeBankPartners/we-cmdb/cmdb-server/services/db"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func DataQuery(c *gin.Context) {
@@ -344,8 +346,8 @@ func GetExtendModelData(c *gin.Context) {
 	}
 	result, err := db.GetExtendModelData(entitySplit[0], entitySplit[1], dataGuid, c.GetHeader(models.HeaderAuthorization))
 	if err != nil {
-		middleware.ReturnServerHandleError(c, fmt.Errorf("get ext model data fail,%s ", err.Error()))
-		return
+		log.Warn(nil, log.LOGGER_APP, "get ext model data fail:GetExtendModelData", zap.Error(err))
+		result = []map[string]interface{}{}
 	}
 	middleware.ReturnPageData(c, models.PageInfo{}, result)
 }

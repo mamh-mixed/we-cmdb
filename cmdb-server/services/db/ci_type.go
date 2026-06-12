@@ -69,6 +69,9 @@ func CiTypesQuery(query *models.CiTypeQuery) error {
 				if ciAttr.AutofillType == "" {
 					ciAttr.AutofillType = "suggest"
 				}
+				if query.Language == models.LanguageEn {
+					ciAttr.DisplayName = ciAttr.Id
+				}
 				// add attribute
 				if _, b := ciAttrMap[ciAttr.CiType]; !b {
 					ciAttrMap[ciAttr.CiType] = []*models.SysCiTypeAttrTable{ciAttr}
@@ -93,6 +96,11 @@ func CiTypesQuery(query *models.CiTypeQuery) error {
 			if strings.Contains(ciType.ImageFile, ".") {
 				imageList = append(imageList, ciType.ImageFile[:strings.LastIndex(ciType.ImageFile, ".")])
 			}
+		}
+	}
+	if query.Language == models.LanguageEn {
+		for _, ciType := range ciTypesTable {
+			ciType.DisplayName = ciType.Id
 		}
 	}
 	staticImageListChan <- imageList

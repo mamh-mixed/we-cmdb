@@ -27,6 +27,11 @@ func AttrQuery(c *gin.Context) {
 	if err != nil {
 		middleware.ReturnServerHandleError(c, err)
 	} else {
+		if c.GetString(models.ContextLanguage) == models.LanguageEn {
+			for _, v := range rowData {
+				v.DisplayName = v.Name
+			}
+		}
 		middleware.ReturnData(c, rowData)
 	}
 }
