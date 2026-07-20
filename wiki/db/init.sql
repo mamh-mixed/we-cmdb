@@ -304,6 +304,9 @@ INSERT INTO `sys_menu` (`id`, `display_name`, `url`, `seq_no`, `parent`, `is_act
 INSERT INTO `sys_menu` (`id`, `display_name`, `url`, `seq_no`, `parent`, `is_active`) VALUES ('data_query_view','数据查询(视图)',NULL,3,'data_query','yes');
 INSERT INTO `sys_menu` (`id`, `display_name`, `url`, `seq_no`, `parent`, `is_active`) VALUES ('model_configuration','模型配置',NULL,1,'configuration','yes');
 INSERT INTO `sys_menu` (`id`, `display_name`, `url`, `seq_no`, `parent`, `is_active`) VALUES ('report_configuration','报表配置',NULL,2,'configuration','yes');
+INSERT INTO `sys_menu` (`id`, `display_name`, `url`, `seq_no`, `parent`, `is_active`) VALUES ('state_machine_configuration','状态机配置','/wecmdb/designing/state-machine',3,'configuration','yes');
+INSERT INTO `sys_menu` (`id`, `display_name`, `url`, `seq_no`, `parent`, `is_active`) VALUES ('ci_template_configuration','CI模板配置','/wecmdb/designing/ci-template-configuration',3,'configuration','yes');
+INSERT INTO `sys_menu` (`id`, `display_name`, `url`, `seq_no`, `parent`, `is_active`) VALUES ('graph_config','视图配置','/wecmdb/designing/graph-config',4,'configuration','yes');
 INSERT INTO `sys_menu` (`id`, `display_name`, `url`, `seq_no`, `parent`, `is_active`) VALUES ('system','系统',NULL,4,NULL,'yes');
 INSERT INTO `sys_menu` (`id`, `display_name`, `url`, `seq_no`, `parent`, `is_active`) VALUES ('system_authority','授权',NULL,2,'system','yes');
 INSERT INTO `sys_menu` (`id`, `display_name`, `url`, `seq_no`, `parent`, `is_active`) VALUES ('system_basekey','基础数据',NULL,1,'system','yes');

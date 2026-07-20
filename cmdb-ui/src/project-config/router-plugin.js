@@ -11,6 +11,8 @@ import configSynchronization from '@/pages/admin/config-synchronization'
 import wecmdbPermissions from '@/pages/admin/plugin-permission-management'
 import graphManagement from '@/pages/designing/graph-management'
 import graphView from '@/pages/designing/graph-view'
+import stateMachine from '@/pro/state-machine.vue'
+import graphConfig from '@/pro/graph-config.vue'
 
 import ciTemplateConfiguration from '@/pages/designing/ci-template-configuration'
 
@@ -25,6 +27,16 @@ const router = [
         path: '/wecmdb/ci-template-configuration',
         name: 'ci-template-configuration',
         component: ciTemplateConfiguration
+      },
+      {
+        path: '/wecmdb/state-machine',
+        name: 'state-machine',
+        component: stateMachine
+      },
+      {
+        path: '/wecmdb/graph-config',
+        name: 'graph-config',
+        component: graphConfig
       },
       {
         path: '/wecmdb/data-mgmt-view',

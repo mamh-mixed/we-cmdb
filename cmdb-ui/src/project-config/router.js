@@ -89,6 +89,16 @@ export default new Router({
           component: () => import('@/pages/designing/ci-template-configuration')
         },
         {
+          path: '/wecmdb/designing/state-machine',
+          name: 'state-machine',
+          component: () => import('@/pro/state-machine.vue')
+        },
+        {
+          path: '/wecmdb/designing/graph-config',
+          name: 'graph-config',
+          component: () => import('@/pro/graph-config.vue')
+        },
+        {
           path: '/wecmdb/designing/ci-data-enquiry',
           name: 'ciDataEnquiry',
           component: () => import('@/pages/designing/ci-data')
